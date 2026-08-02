@@ -75,32 +75,37 @@ def fig_envelopes():
     def env(P):  # 5/50/95 percentile bands
         return np.percentile(P, 5, 1), np.percentile(P, 50, 1), np.percentile(P, 95, 1)
 
+    # (color, linestyle, linewidth, markersize) — A dashed & thinner so B shows THROUGH where they coincide;
+    # start markers: base small, B large, A small-on-top -> A & B markers sit on the SAME point.
+    STY = {'base': ('grey', '-', 1.8, 7), 'B': ('C0', '-', 2.6, 11), 'A': ('C3', '--', 1.6, 5)}
+
+    def draw(ax, series):
+        for P, key, lab in series:
+            c, ls, lw, ms = STY[key]
+            lo, md, hi = env(P)
+            ax.fill_between(TIMES, lo, hi, color=c, alpha=0.10)
+            ax.plot(TIMES, hi, color=c, lw=0.9, ls=ls); ax.plot(TIMES, lo, color=c, lw=0.9, ls=ls)
+            ax.plot(TIMES, md, color=c, lw=lw, ls=ls, label=f'{lab} (median)')
+            ax.plot(0, md[0], 'o', color=c, ms=ms, zorder=5)     # explicit t=0 start marker
+        ax.grid(alpha=.3); ax.legend(fontsize=7)
+
     fig, axs = plt.subplots(2, 3, figsize=(15, 8))
     panels = [('rate', 'Interest rate'), ('eq', 'Equity'), ('fx', 'FX'), ('cm', 'Commodity')]
     for ax, (nm, title) in zip(axs.ravel(), panels):
-        for P, c, lab in [(base_p[nm], 'grey', 'base'), (B_p[nm], 'C0', '(B) level only'),
-                          (A_p[nm], 'C3', '(A) level + vol')]:
-            lo, md, hi = env(P)
-            ax.fill_between(TIMES, lo, hi, color=c, alpha=0.12)
-            ax.plot(TIMES, hi, color=c, lw=1.0); ax.plot(TIMES, lo, color=c, lw=1.0)
-            ax.plot(TIMES, md, color=c, lw=1.8, label=f'{lab} (median)')   # median = the LEVEL
-        ax.set(title=f'{title} — 5–95% envelope + median', xlabel='years'); ax.grid(alpha=.3)
-        ax.legend(fontsize=7)
-    # portfolio value envelope
+        draw(ax, [(base_p[nm], 'base', 'base'), (B_p[nm], 'B', '(B) level only'), (A_p[nm], 'A', '(A) level + vol')])
+        ax.set(title=f'{title} — 5–95% envelope + median', xlabel='years')
     ax = axs.ravel()[4]
-    for V, c, lab in [(base_V, 'grey', 'base'), (B_V, 'C0', '(B) level only'), (A_V, 'C3', '(A) level+vol')]:
-        lo, md, hi = env(V)
-        ax.fill_between(TIMES, lo, hi, color=c, alpha=0.12)
-        ax.plot(TIMES, hi, color=c, lw=1.0); ax.plot(TIMES, lo, color=c, lw=1.0)
-        ax.plot(TIMES, md, color=c, lw=1.8, label=f'{lab} (median)')
-    ax.set(title='Portfolio value V (deep-ITM book)', xlabel='years'); ax.grid(alpha=.3); ax.legend(fontsize=7)
+    draw(ax, [(base_V, 'base', 'base'), (B_V, 'B', '(B) level only'), (A_V, 'A', '(A) level+vol')])
+    ax.set(title='Portfolio value V (deep-ITM book)', xlabel='years')
     axs.ravel()[5].axis('off')
     axs.ravel()[5].text(0.02, 0.5,
-        "Shock s = +0.18.\n\nThe LEVEL shock is IDENTICAL under A\nand B: the median lines (bold) of A (red)\n"
-        "and B (blue) COINCIDE.\n\n(B) leaves the envelope width unchanged.\n\n"
-        "(A) keeps the same level but WIDENS\n     the envelope (realized-vol up).\n\n"
+        "Shock s = +0.18.\n\nA and B START at the SAME point (the\n"
+        "big dots at t=0 coincide) and their\nMEDIAN lines coincide at every horizon —\n"
+        "A (red dashed) sits on top of B (blue),\nso blue shows through the dashes.\n\n"
+        "(B, blue solid) leaves the width fixed.\n(A, red dashed) keeps the same level\n"
+        "     but WIDENS the envelope.\n\n"
         "CE and MTM (t=0 marks) are identical\nunder A and B — blind to the width\n"
-        "change. Only EEPE sees it.", fontsize=10, va='center')
+        "change. Only EEPE sees it.", fontsize=9.5, va='center')
     fig.suptitle('Part 1 — How the simulated risk factors change after a shock (A: vol shocked vs B: not)',
                  fontsize=13)
     fig.tight_layout(); fig.savefig(os.path.join(FIG, "part1_sim_envelopes.png"), dpi=125)
