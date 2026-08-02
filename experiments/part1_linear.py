@@ -82,22 +82,25 @@ def fig_envelopes():
                           (A_p[nm], 'C3', '(A) level + vol')]:
             lo, md, hi = env(P)
             ax.fill_between(TIMES, lo, hi, color=c, alpha=0.12)
-            ax.plot(TIMES, hi, color=c, lw=1.2); ax.plot(TIMES, lo, color=c, lw=1.2, label=lab)
-        ax.set(title=f'{title} — 5–95% path envelope', xlabel='years'); ax.grid(alpha=.3)
+            ax.plot(TIMES, hi, color=c, lw=1.0); ax.plot(TIMES, lo, color=c, lw=1.0)
+            ax.plot(TIMES, md, color=c, lw=1.8, label=f'{lab} (median)')   # median = the LEVEL
+        ax.set(title=f'{title} — 5–95% envelope + median', xlabel='years'); ax.grid(alpha=.3)
         ax.legend(fontsize=7)
     # portfolio value envelope
     ax = axs.ravel()[4]
     for V, c, lab in [(base_V, 'grey', 'base'), (B_V, 'C0', '(B) level only'), (A_V, 'C3', '(A) level+vol')]:
         lo, md, hi = env(V)
         ax.fill_between(TIMES, lo, hi, color=c, alpha=0.12)
-        ax.plot(TIMES, hi, color=c, lw=1.2); ax.plot(TIMES, lo, color=c, lw=1.2, label=lab)
+        ax.plot(TIMES, hi, color=c, lw=1.0); ax.plot(TIMES, lo, color=c, lw=1.0)
+        ax.plot(TIMES, md, color=c, lw=1.8, label=f'{lab} (median)')
     ax.set(title='Portfolio value V (deep-ITM book)', xlabel='years'); ax.grid(alpha=.3); ax.legend(fontsize=7)
     axs.ravel()[5].axis('off')
     axs.ravel()[5].text(0.02, 0.5,
-        "Shock s = +0.18.\n\n(B) shifts each envelope's LEVEL\n     (width unchanged).\n\n"
-        "(A) shifts the level AND widens\n     the envelope (realized-vol up).\n\n"
-        "CE and MTM (t=0 marks) are identical\nunder A and B — they are blind to the\n"
-        "vol/width change. Only EEPE sees it.", fontsize=10, va='center')
+        "Shock s = +0.18.\n\nThe LEVEL shock is IDENTICAL under A\nand B: the median lines (bold) of A (red)\n"
+        "and B (blue) COINCIDE.\n\n(B) leaves the envelope width unchanged.\n\n"
+        "(A) keeps the same level but WIDENS\n     the envelope (realized-vol up).\n\n"
+        "CE and MTM (t=0 marks) are identical\nunder A and B — blind to the width\n"
+        "change. Only EEPE sees it.", fontsize=10, va='center')
     fig.suptitle('Part 1 — How the simulated risk factors change after a shock (A: vol shocked vs B: not)',
                  fontsize=13)
     fig.tight_layout(); fig.savefig(os.path.join(FIG, "part1_sim_envelopes.png"), dpi=125)

@@ -162,8 +162,11 @@ class Simulator:
                 i = self.idx[a.name]
                 Z = self.Zs[:, k - 1, i]
                 if a.process == 'gbm':
-                    sig = a.vol * sc.vol_mult
-                    drift = (R_DISC - a.q - 0.5 * sig * sig) * self.dt
+                    sig = a.vol * sc.vol_mult                       # diffusion (width) scales with the vol shock
+                    # Convexity uses the BASE vol so that shocking the simulation volatility changes only the
+                    # dispersion (envelope width), NOT the central/median path. This keeps the LEVEL shock
+                    # identical between methodology A (vol shocked) and B (vol fixed) -- they differ only in width.
+                    drift = (R_DISC - a.q - 0.5 * a.vol * a.vol) * self.dt
                     lvl[a.name] = lvl[a.name] * np.exp(drift + sig * sdt * Z)
                 else:  # ou (exact)
                     sig = a.vol * sc.vol_mult
