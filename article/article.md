@@ -112,7 +112,7 @@ The scatters above sweep the *magnitude* of a **single** combined shock, so they
 
 ![Part 1 cloud](../figures/part1_cloud.png)
 
-**Figure 3b.** *Deep-ITM:* every shock family collapses onto the 45° line (slope 1.00, residual σ ≈ 0.2 mm) — ΔCE is a reliable proxy no matter which factor moves, because the $\max(\cdot,0)$ is inactive and $\text{EE}\approx\mathbb{E}[V]$. *ATM:* the same ΔCE now maps to a **range** of ΔEEPE (slope 0.89, residual σ ≈ 1.0 mm) — because EEPE depends on the *volatility of the factor that moved*, not just on ΔCE (a commodity move at 25% vol adds more exposure dispersion than an FX move at 10% for the same ΔCE) — plus the vertical stripe at ΔCE = 0 from OTM-side flooring. **The proxy is a line only deep-ITM; it becomes a cloud at the money.**
+**Figure 3b.** ΔEEPE against **ΔMTM (top)** and **ΔCE (bottom)**. *Deep-ITM:* every shock family collapses onto the 45° line (slope 1.00, residual σ ≈ 0.2 mm) — the proxy is reliable no matter which factor moves, because the $\max(\cdot,0)$ is inactive and $\text{EE}\approx\mathbb{E}[V]$. *ATM:* the same ΔMTM/ΔCE now maps to a **range** of ΔEEPE — vs ΔMTM the fit is slope 0.54 (the symmetric hockey-stick smoothing), vs ΔCE it is slope 0.89 with the vertical OTM-flooring stripe at ΔCE = 0; residual σ ≈ 1.0 mm either way. The spread arises because EEPE depends on the *volatility of the factor that moved*, not just on ΔMTM/ΔCE (a commodity move at 25% vol adds more exposure dispersion than an FX move at 10% for the same level change). **The proxy is a line only deep-ITM; it becomes a cloud at the money.**
 
 ### 4.4 Findings (linear)
 
@@ -142,7 +142,7 @@ The scatters above sweep the *magnitude* of a **single** combined shock, so they
 
 ![Part 2 cloud](../figures/part2_cloud.png)
 
-**Figure 6b.** The same test over **many** shocks — each spot factor, the implied-vol factor, and random combinations. The spot families lie on the 45° line while the **implied-vol family (purple) falls below it**: two shocks with the *same* ΔCE produce *different* ΔEEPE. **ΔCE alone does not determine ΔEEPE once the implied-vol dimension is present** — the residual spread is the irreducible proxy error.
+**Figure 6b.** The same test over **many** shocks — each spot factor, the implied-vol factor, and random combinations — with ΔEEPE against **ΔMTM (top)** and **ΔCE (bottom)**. (For this long-option book $V_0>0$, so MTM = CE and the two rows coincide.) The spot families lie on the 45° line while the **implied-vol family (purple) falls below it**: two shocks with the *same* ΔMTM/ΔCE produce *different* ΔEEPE. **The proxy alone does not determine ΔEEPE once the implied-vol dimension is present** — the residual spread is the irreducible proxy error.
 
 ### 5.3 Why implied-vol tracking has slope ≈ 2/3 — the vega term structure
 

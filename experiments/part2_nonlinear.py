@@ -194,21 +194,26 @@ def fig_cloud():
         return L
 
     cases = [('atm', 'ATM options'), ('otm', 'OTM options')]
-    fig, axs = plt.subplots(1, 2, figsize=(13.5, 5.8))
-    for ax, (key, title) in zip(axs, cases):
+    fig, axs = plt.subplots(2, 2, figsize=(13, 10))
+    for ci, (key, title) in enumerate(cases):
         tr = book(key); base = metrics_for(tr, Scenario())
-        seen = set(); X, Y = [], []
+        data = {f: ([], [], []) for f in fams}          # dMTM, dCE, dEEPE
         for sc, fam in shocks():
             m = metrics_for(tr, sc)
-            x, y = m['CE'] - base['CE'], m['EEPE'] - base['EEPE']
-            ax.scatter(x, y, s=16, color=col[fam], alpha=0.8, label=fam if fam not in seen else None)
-            seen.add(fam); X.append(x); Y.append(y)
-        X, Y = np.array(X), np.array(Y)
-        a, b = np.polyfit(X, Y, 1); resid = Y - (a * X + b)
-        xs = np.array([X.min(), X.max()]); ax.plot(xs, xs, 'k--', lw=1, label='45°')
-        ax.set_title(f'{title}: ΔEEPE vs ΔCE over MANY shocks\nfit slope {a:.2f}, residual σ = {resid.std():.2f} mm')
-        ax.set(xlabel='ΔCE (mm)', ylabel='ΔEEPE (mm)'); ax.grid(alpha=.3); ax.legend(fontsize=6.5)
-    fig.suptitle('Part 2 — spot shocks track (45°), implied-vol shocks fall below (vega) → ΔCE is a cloud', fontsize=12)
+            data[fam][0].append(m['MTM'] - base['MTM'])
+            data[fam][1].append(m['CE'] - base['CE'])
+            data[fam][2].append(m['EEPE'] - base['EEPE'])
+        allE = np.concatenate([np.array(data[f][2]) for f in fams])
+        for row, (xlab, idx) in enumerate([('ΔMTM', 0), ('ΔCE', 1)]):
+            ax = axs[row, ci]; xall = np.concatenate([np.array(data[f][idx]) for f in fams])
+            for f in fams:
+                xs = np.array(data[f][idx])
+                if len(xs): ax.scatter(xs, np.array(data[f][2]), s=15, color=col[f], alpha=0.8, label=f)
+            a, b = np.polyfit(xall, allE, 1); resid = allE - (a * xall + b)
+            lim = np.array([xall.min(), xall.max()]); ax.plot(lim, lim, 'k--', lw=1, label='45°')
+            ax.set_title(f'{title}: ΔEEPE vs {xlab}  (slope {a:.2f}, σ = {resid.std():.2f} mm)')
+            ax.set(xlabel=f'{xlab} (mm)', ylabel='ΔEEPE (mm)'); ax.grid(alpha=.3); ax.legend(fontsize=6)
+    fig.suptitle('Part 2 — ΔEEPE vs ΔMTM (top) and ΔCE (bottom): spot tracks (45°), implied-vol falls below (vega)', fontsize=12)
     fig.tight_layout(); fig.savefig(os.path.join(FIG, "part2_cloud.png"), dpi=125); plt.close(fig)
     print("Part 2 cloud written.")
 
