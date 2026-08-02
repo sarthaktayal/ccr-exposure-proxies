@@ -53,10 +53,13 @@ def scenario(s, shock_vol):
         vol_mult=(1 + BETA_VOL * s) if shock_vol else 1.0,
     )
 
-def metrics_for(trades, s, shock_vol):
-    paths, ivp = SIM.simulate(scenario(s, shock_vol))
+def metrics_sc(trades, sc):
+    paths, ivp = SIM.simulate(sc)
     V = price_portfolio(trades, ASSETS, paths, ivp, TIMES)
     return exposure_metrics(V, TIMES, eepe_window=1.0)
+
+def metrics_for(trades, s, shock_vol):
+    return metrics_sc(trades, scenario(s, shock_vol))
 
 # ============================================================================ #
 #  Figure 1 -- how the simulations change after a shock (per factor + portfolio)
@@ -174,7 +177,55 @@ def fig_tracking():
               f"  A(vol shocked)={slope(r['dEEPE_A']):.3f}")
 
 
+def fig_cloud():
+    """Many DIFFERENT shocks (individual factors, combined, random) -> is ΔEEPE a
+    function of ΔCE (line) or a cloud? Methodology B (realized vol fixed)."""
+    import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
+    rng = np.random.default_rng(0)
+    fams = ['equity only', 'FX only', 'commodity only', 'rate only', 'combined level', 'combined level+vol', 'random combined']
+    col = dict(zip(fams, ['C0', 'C1', 'C2', 'C8', 'k', 'C3', 'C7']))
+
+    def shocks():
+        L = []
+        for s in np.linspace(-0.15, 0.15, 9):
+            if abs(s) < 1e-9: continue
+            L += [(Scenario(spot_mult={'eq': 1 + s}), 'equity only'),
+                  (Scenario(spot_mult={'fx': 1 + s}), 'FX only'),
+                  (Scenario(spot_mult={'cm': 1 + s}), 'commodity only'),
+                  (Scenario(rate_add={'rate': 0.03 * s}), 'rate only'),
+                  (scenario(s, False), 'combined level'),
+                  (scenario(s, True), 'combined level+vol')]
+        for _ in range(45):
+            L.append((Scenario(spot_mult={'eq': 1 + rng.uniform(-.15, .15), 'fx': 1 + rng.uniform(-.1, .1),
+                                          'cm': 1 + rng.uniform(-.15, .15)},
+                               rate_add={'rate': rng.uniform(-.005, .005)}), 'random combined'))
+        return L
+
+    cases = [('deep_itm', 'Deep ITM'), ('atm', 'ATM')]
+    fig, axs = plt.subplots(1, 2, figsize=(13.5, 5.8))
+    for ax, (key, title) in zip(axs, cases):
+        tr = book(key); base = metrics_sc(tr, Scenario())
+        seen = set(); pts = {}
+        for sc, fam in shocks():
+            m = metrics_sc(tr, sc)
+            x, y = m['CE'] - base['CE'], m['EEPE'] - base['EEPE']
+            ax.scatter(x, y, s=16, color=col[fam], alpha=0.8, label=fam if fam not in seen else None)
+            seen.add(fam); pts.setdefault('x', []).append(x); pts.setdefault('y', []).append(y)
+        X, Y = np.array(pts['x']), np.array(pts['y'])
+        if np.ptp(X) > 1e-6:
+            a, b = np.polyfit(X, Y, 1); resid = Y - (a * X + b)
+            xs = np.array([X.min(), X.max()]); ax.plot(xs, xs, 'k--', lw=1, label='45°')
+            ax.set_title(f'{title}: ΔEEPE vs ΔCE over MANY shocks\nfit slope {a:.2f}, residual σ = {resid.std():.2f} mm')
+        else:
+            ax.set_title(f'{title}: ΔCE frozen (OTM-like)')
+        ax.set(xlabel='ΔCE (mm)', ylabel='ΔEEPE (mm)'); ax.grid(alpha=.3); ax.legend(fontsize=6.5)
+    fig.suptitle('Part 1 — Different shocks give the SAME ΔCE but DIFFERENT ΔEEPE (a cloud, not a line)', fontsize=12)
+    fig.tight_layout(); fig.savefig(os.path.join(FIG, "part1_cloud.png"), dpi=125); plt.close(fig)
+    print("Part 1 cloud written.")
+
+
 if __name__ == "__main__":
     fig_envelopes()
     fig_tracking()
+    fig_cloud()
     print("figures written to", os.path.abspath(FIG))

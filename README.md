@@ -55,8 +55,10 @@ python experiments/part2_nonlinear.py
 |---|---|
 | Linear — sims change under shock | `figures/part1_sim_envelopes.png` |
 | Linear — ΔEEPE vs ΔCE/ΔMTM by moneyness | `figures/part1_tracking.png`, `part1_scatter.png` |
+| Linear — many shocks: line vs **cloud** | `figures/part1_cloud.png` |
 | Non-linear — implied vol as a risk factor | `figures/part2_sim_envelopes.png` |
 | Non-linear — spot vs implied-vol shocks | `figures/part2_tracking.png`, `part2_scatter.png` |
+| Non-linear — many shocks: spot vs implied **cloud** | `figures/part2_cloud.png` |
 
 ## Caveats
 

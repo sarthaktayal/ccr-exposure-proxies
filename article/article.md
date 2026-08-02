@@ -106,7 +106,15 @@ The **linear** book is an IR payer swap plus equity/FX/commodity forwards; the *
 
 **Figure 3.** ΔEEPE against ΔMTM (top) and ΔCE (bottom). Measured slopes: deep-ITM ≈ 0.99; ATM ≈ 0.93 versus ΔCE but ≈ 0.51 versus ΔMTM (the hockey-stick smoothing); OTM ΔEEPE-vs-ΔCE is **degenerate** (ΔCE ≡ 0). The bottom-right panel shows the OTM cells collapsing onto a vertical line: *one* value of ΔCE, a *range* of ΔEEPE.
 
-### 4.3 Findings (linear)
+### 4.3 Line or cloud? Testing many different shocks
+
+The scatters above sweep the *magnitude* of a **single** combined shock, so they trace a curve. A stronger test applies **many different shocks** — each risk factor independently, the combined shock, and random combinations — and asks whether ΔEEPE is genuinely a *function* of ΔCE.
+
+![Part 1 cloud](../figures/part1_cloud.png)
+
+**Figure 3b.** *Deep-ITM:* every shock family collapses onto the 45° line (slope 1.00, residual σ ≈ 0.2 mm) — ΔCE is a reliable proxy no matter which factor moves, because the $\max(\cdot,0)$ is inactive and $\text{EE}\approx\mathbb{E}[V]$. *ATM:* the same ΔCE now maps to a **range** of ΔEEPE (slope 0.89, residual σ ≈ 1.0 mm) — because EEPE depends on the *volatility of the factor that moved*, not just on ΔCE (a commodity move at 25% vol adds more exposure dispersion than an FX move at 10% for the same ΔCE) — plus the vertical stripe at ΔCE = 0 from OTM-side flooring. **The proxy is a line only deep-ITM; it becomes a cloud at the money.**
+
+### 4.4 Findings (linear)
 
 1. **Deep ITM ⇒ tracks.** With the netting set clear of zero and no vega, ΔCE ≈ ΔMTM ≈ ΔEEPE.
 2. **Moneyness is the first gate.** EEPE is the smoothed hockey-stick $\mathbb{E}[\max(V_0+\sigma_{\text{exp}}\sqrt{T}\,Z,0)]$ in $V_0$. CE is its kinked $t=0$ shadow. They agree only where $V_0$ is many exposure-sigmas from zero.
@@ -131,6 +139,10 @@ The **linear** book is an IR payer swap plus equity/FX/commodity forwards; the *
 ![Part 2 scatter](../figures/part2_scatter.png)
 
 **Figure 6.** ΔEEPE versus ΔCE. **Spot** shocks sit on the 45° line (slope ≈ 1.0). **Implied-vol** shocks sit *below* it (slope ≈ 0.68). Same book, two shock types, two very different tracking qualities.
+
+![Part 2 cloud](../figures/part2_cloud.png)
+
+**Figure 6b.** The same test over **many** shocks — each spot factor, the implied-vol factor, and random combinations. The spot families lie on the 45° line while the **implied-vol family (purple) falls below it**: two shocks with the *same* ΔCE produce *different* ΔEEPE. **ΔCE alone does not determine ΔEEPE once the implied-vol dimension is present** — the residual spread is the irreducible proxy error.
 
 ### 5.3 Why implied-vol tracking has slope ≈ 2/3 — the vega term structure
 

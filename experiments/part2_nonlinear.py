@@ -167,7 +167,54 @@ def fig_tracking():
               f"  implied slope(EEPE/CE)={sl(r['vCE'], r['vEEPE']):.2f}")
 
 
+def fig_cloud():
+    """Many different shocks (spot per factor, implied-vol, combined, random):
+    spot family lands on the 45° line (delta), implied family falls below (vega)
+    -> ΔCE is a cloud w.r.t. ΔEEPE once both dimensions are present."""
+    import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
+    rng = np.random.default_rng(0)
+    fams = ['equity spot', 'commodity spot', 'rate spot', 'implied vol (all)', 'combined spot', 'random spot+implied']
+    col = dict(zip(fams, ['C0', 'C2', 'C8', 'C4', 'k', 'C7']))
+
+    def shocks():
+        L = []
+        for s in np.linspace(-0.12, 0.12, 9):
+            if abs(s) < 1e-9: continue
+            L += [(Scenario(spot_mult={'eq': 1 + s}), 'equity spot'),
+                  (Scenario(spot_mult={'cm': 1 + s}), 'commodity spot'),
+                  (Scenario(rate_add={'rate': 0.008 * s}), 'rate spot'),
+                  (sc_spot(s, False), 'combined spot')]
+        for dv in np.linspace(-0.30, 0.30, 9):
+            if abs(dv) < 1e-9: continue
+            L.append((sc_iv(dv), 'implied vol (all)'))
+        for _ in range(35):
+            L.append((Scenario(spot_mult={'eq': 1 + rng.uniform(-.12, .12), 'cm': 1 + rng.uniform(-.12, .12)},
+                               rate_add={'rate': rng.uniform(-.004, .004)},
+                               iv_add={a: IMP0[a] * rng.uniform(-.25, .25) for a in IMP0}), 'random spot+implied'))
+        return L
+
+    cases = [('atm', 'ATM options'), ('otm', 'OTM options')]
+    fig, axs = plt.subplots(1, 2, figsize=(13.5, 5.8))
+    for ax, (key, title) in zip(axs, cases):
+        tr = book(key); base = metrics_for(tr, Scenario())
+        seen = set(); X, Y = [], []
+        for sc, fam in shocks():
+            m = metrics_for(tr, sc)
+            x, y = m['CE'] - base['CE'], m['EEPE'] - base['EEPE']
+            ax.scatter(x, y, s=16, color=col[fam], alpha=0.8, label=fam if fam not in seen else None)
+            seen.add(fam); X.append(x); Y.append(y)
+        X, Y = np.array(X), np.array(Y)
+        a, b = np.polyfit(X, Y, 1); resid = Y - (a * X + b)
+        xs = np.array([X.min(), X.max()]); ax.plot(xs, xs, 'k--', lw=1, label='45°')
+        ax.set_title(f'{title}: ΔEEPE vs ΔCE over MANY shocks\nfit slope {a:.2f}, residual σ = {resid.std():.2f} mm')
+        ax.set(xlabel='ΔCE (mm)', ylabel='ΔEEPE (mm)'); ax.grid(alpha=.3); ax.legend(fontsize=6.5)
+    fig.suptitle('Part 2 — spot shocks track (45°), implied-vol shocks fall below (vega) → ΔCE is a cloud', fontsize=12)
+    fig.tight_layout(); fig.savefig(os.path.join(FIG, "part2_cloud.png"), dpi=125); plt.close(fig)
+    print("Part 2 cloud written.")
+
+
 if __name__ == "__main__":
     fig_envelopes()
     fig_tracking()
+    fig_cloud()
     print("figures written to", os.path.abspath(FIG))
