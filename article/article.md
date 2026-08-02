@@ -106,6 +106,10 @@ The **linear** book is an IR payer swap plus equity/FX/commodity forwards; the *
 
 **Figure 3.** ΔEEPE against ΔMTM (top) and ΔCE (bottom). Measured slopes: deep-ITM ≈ 0.99; ATM ≈ 0.93 versus ΔCE but ≈ 0.51 versus ΔMTM (the hockey-stick smoothing); OTM ΔEEPE-vs-ΔCE is **degenerate** (ΔCE ≡ 0). The bottom-right panel shows the OTM cells collapsing onto a vertical line: *one* value of ΔCE, a *range* of ΔEEPE.
 
+> **Why the positive-quadrant slope is below 1 (linear).** MTM moves 1:1 with the shock, but EEPE moves at its *exposure delta*
+> $$\frac{d\,\text{EEPE}}{dV_0}\approx\overline{P(V_t>0)}=\Phi(d)\le 1,$$
+> the time-averaged probability that the netting set is in the money — $\approx 0.5$ at the money, $\to 0$ deep-OTM, and $\to 1$ only deep-ITM. So a positive shock pushes the book deeper ITM while its *time-value cushion* $\sigma_{\text{exp}}\sqrt{T}\,\varphi(d)$ erodes: CE and MTM rise at full speed, EEPE lags, and the two **converge**. Equivalently, EEPE sits *above* CE/MTM in level, but that gap **shrinks** with moneyness, so $\Delta\text{EEPE}<\Delta\text{CE}/\Delta\text{MTM}$ in the positive quadrant (and the reverse in the negative quadrant — a through-origin slope $<1$). This is a pure **netting-set $\max(\cdot,0)$** effect: *no vega is involved*. It is the linear counterpart of the vega-term-structure mechanism in §5.3.
+
 ### 4.3 Line or cloud? Testing many different shocks
 
 The scatters above sweep the *magnitude* of a **single** combined shock, so they trace a curve. A stronger test applies **many different shocks** — each risk factor independently, the combined shock, and random combinations — and asks whether ΔEEPE is genuinely a *function* of ΔCE.
@@ -124,25 +128,32 @@ The scatters above sweep the *magnitude* of a **single** combined shock, so they
 
 ## 5. Part 2 — Non-linear portfolio (options), implied vol as a risk factor
 
+Implied vol is a risk factor with **two** attributes: a **level** (the base implied vol) and a **diffusion vol** (its vol-of-vol). The shock methodology therefore mirrors Part 1 exactly, now applied to *all* factors including implied vol:
+
+- **(B)** shock all **levels** — spot levels *and* base implied vol — with **no** diffusion-vol shock (realized spot vol fixed *and* vol-of-vol fixed).
+- **(A)** shock all levels **and** all diffusion vols (realized spot vol *and* vol-of-vol).
+
+Because CE and MTM are $t=0$ marks, they respond to the level shock (spot **delta** + implied-vol **vega**) but are **identical under A and B** — blind to the diffusion/width change.
+
 ### 5.1 The simulated risk factors, including implied vol
 
 ![Part 2 simulation envelopes](../figures/part2_sim_envelopes.png)
 
-**Figure 4.** Spot envelopes (equity, commodity, rate), the **implied-volatility envelopes** (equity, commodity) — each a *risk factor in its own right*, fanning out under its vol-of-vol and mean-reverting to its target — and the portfolio value. A spot+realized-vol shock (red) widens the spot cones; an implied-vol shock (purple) lifts the implied-vol cones and the option book value. Because implied and realized vol are separate parameters, these are **independent** perturbations.
+**Figure 4.** Spot and **implied-volatility** envelopes (each a risk factor with its own fan), plus the portfolio value, under base / **(B)** / **(A)**. Read the implied-vol panels: under **(B)** the base implied vol is shocked up (median lifts, e.g. 20%→24.5%) with the **same fan width**; under **(A)** the median coincides but the **fan is wider** because the vol-of-vol is also shocked. The start markers and medians of A and B coincide throughout — the level shock is identical; only the diffusion width differs.
 
-### 5.2 Spot shocks versus implied-vol shocks
+### 5.2 A unified level shock, with and without a diffusion-vol shock
 
 ![Part 2 tracking](../figures/part2_tracking.png)
 
-**Figure 5.** *Top row (spot shock):* ΔMTM, ΔCE and ΔEEPE(B) coincide; the option gamma gives the mild convexity, and the realized-vol-shocked EEPE(A) sits slightly above on the upside. **Delta tracks.** *Bottom row (implied-vol shock):* ΔMTM = ΔCE (long options, $V_0>0$, so CE inherits the full $t=0$ vega), but **ΔEEPE lies below** — CE *over-states* the vega response.
+**Figure 5.** Δ metrics vs the level shock $s$, per moneyness. ΔMTM and ΔCE coincide (long options, $V_0>0$) and carry both the spot **delta** and the implied-vol **vega**. **ΔEEPE(B)** sits **just below** them (slope ≈ 0.96–0.98) — the implied-vol *level* component contributes a **damped** vega to EEPE (§5.3). **ΔEEPE(A)** sits **just above** (slope ≈ 1.05–1.07) — shocking the diffusion vols widens the envelope, adding exposure that CE/MTM cannot see. A and B differ *only* by the diffusion-vol shock.
 
 ![Part 2 scatter](../figures/part2_scatter.png)
 
-**Figure 6.** ΔEEPE versus ΔCE. **Spot** shocks sit on the 45° line (slope ≈ 1.0). **Implied-vol** shocks sit *below* it (slope ≈ 0.68). Same book, two shock types, two very different tracking qualities.
+**Figure 6.** ΔEEPE vs ΔMTM (top) and ΔCE (bottom), B vs A. B lies just inside the 45° line (damped implied-vol vega); A just outside it (diffusion widening). The gap between the A and B point clouds is exactly the diffusion-vol contribution — the part of ΔEEPE invisible to CE/MTM.
 
 ![Part 2 cloud](../figures/part2_cloud.png)
 
-**Figure 6b.** The same test over **many** shocks — each spot factor, the implied-vol factor, and random combinations — with ΔEEPE against **ΔMTM (top)** and **ΔCE (bottom)**. (For this long-option book $V_0>0$, so MTM = CE and the two rows coincide.) The spot families lie on the 45° line while the **implied-vol family (purple) falls below it**: two shocks with the *same* ΔMTM/ΔCE produce *different* ΔEEPE. **The proxy alone does not determine ΔEEPE once the implied-vol dimension is present** — the residual spread is the irreducible proxy error.
+**Figure 6b.** Many different shocks. **Spot-level** shocks (blue) lie on the 45° line; **implied-vol-level** shocks (purple) fall *below* it (damped vega); **random** shocks that also move the diffusion vols (grey) scatter *above* it. The residual σ (≈ 1.4 mm at ATM) is the irreducible proxy error once the implied-vol level and the diffusion vols — neither of which CE/MTM fully capture — are in play.
 
 ### 5.3 Why implied-vol tracking has slope ≈ 2/3 — the vega term structure
 
@@ -150,13 +161,15 @@ CE and EEPE feel the *same* implied-vol bump; what differs is the **vega it mult
 
 $$\frac{\Delta\text{EEPE}}{\Delta\text{CE}}\ \approx\ \frac{\frac{1}{T}\int_0^{T}\sqrt{T-t}\,dt}{\sqrt{T}}\ =\ \frac{2}{3},$$
 
-matching the measured 0.68. (If the implied-vol shock also *mean-reverts* rather than persisting, a second decay compounds this and the ratio falls further.) This is a genuine, direction-dependent bias: for a **vol increase** CE over-states the exposure rise — the *conservative* direction — whereas a *realized*-vol move (Section 4.3) moves EEPE while leaving CE flat — the *anti-conservative* direction.
+matching the ≈ 0.66 slope measured for a *pure* implied-vol-level shock. In the **unified** level shock (Figure 5) this vega enters only as the *implied-vol component* of a shock that is mostly spot **delta**, so the blended slope of ΔEEPE(B) is ≈ 0.96 — the delta part tracks at 1 and the implied-vol part drags it slightly below. (If the implied-vol shock also *mean-reverts* rather than persisting, a second decay compounds the wedge.) The bias is direction-dependent: for a **vol increase** CE over-states the exposure rise — *conservative* — whereas a *diffusion*-vol move (methodology A / §4.4) moves EEPE while leaving CE flat — *anti-conservative*.
+
+> **Why the positive-quadrant slope is below 1 (non-linear).** On an up-shock (spot **and** base implied vol rising), $\Delta\text{CE}=\Delta\text{MTM}$ exceeds $\Delta\text{EEPE}(B)$ because CE books the implied-vol bump at the option's **full-maturity vega** while EEPE averages a **decaying** vega over the aging profile (the $\approx 2/3$ factor above). The spot-delta part tracks at 1; the implied-vol part drags the blend to $\approx 0.96$. This is the **instrument-option vega** counterpart of the linear **exposure-delta** effect (§4.2) — a *different* mechanism (vega vs the netting-set $\max$), *same* sign. Methodology **A** then adds envelope width (invisible to CE/MTM) and pushes the slope back above 1.
 
 ### 5.4 Findings (non-linear)
 
-1. **Delta tracks; vega does not.** ΔCE proxies a spot shock (slope ≈ 1) but over-states an implied-vol shock (slope ≈ 2/3).
-2. **Optionality per se does not break the proxy** — a long-premium book keeps $V_0>0$, so CE inherits the gamma and vega and tracks a spot shock well. What breaks it is the **implied-vol dimension** (a risk factor CE marks only at $t=0$) and the netting-set value approaching zero.
-3. **Implied ≠ realized matters.** Treating them as one number produces artificially perfect tracking; separating them reveals the vega term-structure wedge.
+1. **Level shock: B tracks with a small vega drag; A adds diffusion width.** Shocking all levels (spot + base implied vol) gives ΔEEPE(B)/ΔCE ≈ 0.96–0.98 — the spot delta tracks at 1, the implied-vol *level* adds a damped-vega drag. Additionally shocking the diffusion vols (realized *and* vol-of-vol) lifts it to ΔEEPE(A)/ΔCE ≈ 1.05–1.07. **CE and MTM are identical under A and B**, so the entire A–B gap is exposure invisible to the proxy.
+2. **Optionality per se does not break the proxy** — a long-premium book keeps $V_0>0$, so CE inherits the gamma and vega. What the proxy cannot see is the **diffusion** dimension (realized vol and vol-of-vol) and the **vega term structure** of the implied-vol level.
+3. **Implied ≠ realized, and level ≠ diffusion.** Implied vol carries a level (seen by CE) and a vol-of-vol (unseen); realized vol is a third, separate parameter (also unseen). Treating any of these as one number hides real exposure.
 
 ---
 

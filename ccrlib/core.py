@@ -97,8 +97,9 @@ class Scenario:
     """An instantaneous market shock applied to the initial state."""
     spot_mult: dict = field(default_factory=dict)   # gbm: multiplicative level shock (1+ds)
     rate_add: dict = field(default_factory=dict)     # ou: additive level shock
-    vol_mult: float = 1.0                             # scales REALIZED diffusion vol (all assets)
-    iv_add: dict = field(default_factory=dict)        # additive implied-vol level shock
+    vol_mult: float = 1.0                             # scales REALIZED diffusion vol of spots/rate
+    iv_add: dict = field(default_factory=dict)        # additive implied-vol LEVEL shock (base implied vol)
+    iv_vov_mult: float = 1.0                           # scales the VOL-OF-VOL (diffusion vol of implied vol)
     iv_persist: bool = True                           # shift iv mean-reversion target too
 
 
@@ -178,7 +179,7 @@ class Simulator:
                 i = self.idx[a.name]
                 Wv = a.iv_rho * self.Zs[:, k - 1, i] + np.sqrt(1 - a.iv_rho ** 2) * self.Eta[:, k - 1, j]
                 lnsig[a.name] = lnsig[a.name] + a.iv_kappa * (np.log(iv_theta[a.name]) - lnsig[a.name]) * self.dt \
-                    + a.iv_nu * sdt * Wv
+                    + (a.iv_nu * sc.iv_vov_mult) * sdt * Wv       # vol-of-vol scaled by the diffusion-vol shock
                 ivp[a.name][k] = np.exp(lnsig[a.name])
         return paths, ivp
 
