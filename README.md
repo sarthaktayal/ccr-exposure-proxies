@@ -2,7 +2,7 @@
 
 A small, reproducible research repo that studies **how well the change in Current Exposure (ΔCE) and Mark-to-Market (ΔMTM) proxy the change in Effective EPE (ΔEEPE)** for counterparty-credit portfolios under market shocks — across moneyness regimes, for linear and non-linear (options) books, and treating **implied volatility as a risk factor distinct from the simulation volatility**.
 
-> **Read the full write-up:** [`article/article.md`](article/article.md)
+> **Read the full write-up:** [rendered article (GitHub Pages)](https://sarthaktayal.github.io/ccr-exposure-proxies/) · [markdown source](article/article.md)
 
 ## TL;DR findings
 
