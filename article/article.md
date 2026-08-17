@@ -232,22 +232,23 @@ Differentiating $\text{EE}(t)=\mathbb{E}[\max(V(t),0)]$ through the max (to firs
 $$\Delta\text{EE}(t) = \mathbb{E}\big[\mathbf{1}\{V(t)>0\}\,\Delta V(t)\big] = \varepsilon\,D(t)\,\mathbb{E}\big[\mathbf{1}\{V(t)>0\}\,\pi(t)\big],$$
 where the last step uses that $D(t)$ is **state-independent** and so pulls out of the path-expectation. This "pull-out" is the essence of linearity: no gamma, hence no path-dependent gearing.
 
-**The ratio.** For a deterministic $\pi(t)$, $\mathbb{E}[\mathbf{1}\{V>0\}\,\pi]=\pi\,P(V>0)$, giving three state-independent factors:
-$$\frac{\Delta\text{EE}(t)}{\Delta\text{MTM}} = \underbrace{\frac{D(t)}{D(0)}}_{\text{carry / roll-off}} \cdot \underbrace{\pi(t)}_{\text{persistence}} \cdot \underbrace{P(V(t)>0)}_{\text{floor (moneyness)}}.$$
+**The ratio (in magnitudes).** The meaningful comparison is $|\Delta\text{EE}(t)|$ against $|\Delta\text{MTM}|$. For a deterministic $\pi(t)$, $\mathbb{E}[\mathbf{1}\{V>0\}\,\pi]=\pi\,P(V>0)\ge 0$, giving three non-negative, state-independent factors:
+$$\frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = \underbrace{\frac{D(t)}{D(0)}}_{\text{carry / roll-off}} \cdot \underbrace{\pi(t)}_{\text{persistence}} \cdot \underbrace{P(V(t)>0)}_{\text{floor (moneyness)}}.$$
+**Signs always agree** for a linear book: both $\Delta\text{EE}$ and $\Delta\text{MTM}$ equal $\varepsilon\,D(0)$ times a non-negative quantity, so they co-move and the signed and absolute ratios coincide.
 
 **Closed form.** Zeroing the carry ($D(t)/D(0)=1$) and taking a parallel shift ($\pi(t)=1$), $V(t)$ is Normal with mean $=\text{MTM}$ and standard deviation $\sigma_{\exp}(t)$ (the exposure dispersion), so
-$$\boxed{\ \frac{\Delta\text{EE}(t)}{\Delta\text{MTM}} = P(V(t)>0) = \Phi\!\left(\frac{\text{MTM}}{\sigma_{\exp}(t)}\right) = \Phi\!\left(\frac{\text{moneyness}}{\text{dispersion}}\right)\ }$$
+$$\boxed{\ \frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = P(V(t)>0) = \Phi\!\left(\frac{\text{MTM}}{\sigma_{\exp}(t)}\right) = \Phi\!\left(\frac{\text{moneyness}}{\text{dispersion}}\right)\ }$$
 with $\Phi$ the standard normal CDF: the sensitivity ratio is exactly the probability of being in the money.
 
 **Example — FX forward** ($X_0=1.10$, $\sigma=0.11/\sqrt{\text{yr}}$, $t=0.5 \Rightarrow \sigma_{\exp}=0.078$):
 
-| case | strike K | moneyness $X_0-K$ | $(X_0-K)/\sigma_{\exp}$ | $\Delta\text{EE}(t)/\Delta\text{MTM}=\Phi(\cdot)$ |
+| case | strike K | moneyness $X_0-K$ | $(X_0-K)/\sigma_{\exp}$ | $\lvert\Delta\text{EE}(t)\rvert/\lvert\Delta\text{MTM}\rvert=\Phi(\cdot)$ |
 |---|---|---|---|---|
 | ITM | 0.95 | +0.15 | +1.93 | 0.97 |
 | ATM | 1.10 | 0.00 | 0.00 | 0.50 |
 | OTM | 1.25 | −0.15 | −1.93 | 0.03 |
 
-**Consequence.** Since $\Phi(\cdot)\le 1$, $\Delta\text{EE}(t)\le\Delta\text{MTM}$ for any linear book: the ratio is a genuine **fraction**, set by moneyness over dispersion — $\approx 1$ deep-ITM, exactly $0.5$ at the money, $\to 0$ deep-OTM — and pulled toward $0.5$ at long horizons as $\sigma_{\exp}(t)$ grows. A mean-reverting factor adds the $\pi(t)=e^{-\kappa t}<1$ dampener; an amortizing swap adds $D(t)/D(0)<1$. With no gamma, nothing can push the ratio above 1. This is the analytical backbone of the Part 1 results; the non-linear case (§5) replaces the deterministic $D(t)$ with a state-dependent one whose conditional average $\mathbb{E}[D(t)\mid V(t)>0]$ can exceed $D(0)$, allowing the ratio to exceed 1.
+**Consequence.** Since $\Phi(\cdot)\le 1$, $|\Delta\text{EE}(t)|\le|\Delta\text{MTM}|$ for any linear book — the hypothesis that *the exposure moves no more than the MTM, in the same direction*, always holds. The ratio is a genuine **fraction**, set by moneyness over dispersion — $\approx 1$ deep-ITM, exactly $0.5$ at the money, $\to 0$ deep-OTM — and pulled toward $0.5$ at long horizons as $\sigma_{\exp}(t)$ grows. A mean-reverting factor adds the $\pi(t)=e^{-\kappa t}<1$ dampener; an amortizing swap adds $D(t)/D(0)<1$. With no gamma, nothing can push the ratio above 1. This is the analytical backbone of the Part 1 results; the non-linear case (§5, Appendix C) replaces the deterministic $D(t)$ with a state-dependent one whose conditional average $\mathbb{E}[D(t)\mid V(t)>0]$ can exceed $D(0)$ — or flip sign.
 
 ## Appendix C — The non-linear law: when ΔEE(t) can exceed ΔMTM
 
@@ -264,17 +265,26 @@ $$\Delta V(t) = D(t)\,\pi(t)\,\varepsilon.$$
 $$\Delta\text{MTM} = D(0)\,\varepsilon,\qquad \Delta\text{EE}(t) = \varepsilon\,\mathbb{E}\big[\mathbf{1}\{V(t)>0\}\,D(t)\,\pi(t)\big].$$
 Now $D(t)$ is state-dependent, so — unlike the linear case — it **cannot** be pulled out of the path-expectation.
 
-**The ratio.** Write the expectation as probability × conditional expectation:
-$$\frac{\Delta\text{EE}(t)}{\Delta\text{MTM}} = \underbrace{P(V(t)>0)}_{\text{floor}\ \le 1} \cdot \underbrace{\frac{\mathbb{E}\big[D(t)\,\pi(t)\mid V(t)>0\big]}{D(0)}}_{\text{conditional-delta ratio}}.$$
-The floor is $\le 1$ exactly as before, but the **conditional-delta ratio is not bounded by 1**:
+**The ratio (in magnitudes).** Comparing $|\Delta\text{EE}(t)|$ to $|\Delta\text{MTM}|$ and writing the expectation as probability × conditional expectation:
+$$\frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = \underbrace{P(V(t)>0)}_{\text{floor}\ \le 1} \cdot \underbrace{\frac{\big|\mathbb{E}[D(t)\,\pi(t)\mid V(t)>0]\big|}{|D(0)|}}_{\text{conditional-delta ratio}}.$$
+The floor is $\le 1$ exactly as before, but the **conditional-delta ratio is no longer pinned to 1 — nor even to a fixed sign**:
 
-- **Linear (Appendix B):** $D(t)$ is state-independent, so it collapses to the deterministic carry $D(t)/D(0)$ — mild, $\le 1$ typically.
-- **Non-linear:** $\mathbb{E}[D(t)\mid V(t)>0]$ can far **exceed** $D(0)$. For an out-of-the-money option, $D(0)$ is small (a long shot today), but the exposure-relevant paths — the ones with $V(t)>0$ — are exactly those where the underlying rallied and the option **geared up** to delta $\approx 1$. This is *gamma gearing*. The propagation $\pi(t)=X(t)/x_0>1$ on those same up-paths adds a second amplifier.
+- **Linear (Appendix B):** $D(t)$ is state-independent, so it collapses to the deterministic carry $D(t)/D(0)$ — mild, $\le 1$ typically, same sign always.
+- **Non-linear:** $\mathbb{E}[D(t)\mid V(t)>0]$ can **exceed** $D(0)$ in magnitude, and can even **differ in sign** from it.
 
-**Condition for amplification:**
-$$\Delta\text{EE}(t) > \Delta\text{MTM} \iff \mathbb{E}\big[D(t)\,\pi(t)\,\mathbf{1}\{V(t)>0\}\big] > D(0).$$
+**Why the hypothesis usually holds.** The proxy hypothesis — *$|\Delta\text{EE}|\le|\Delta\text{MTM}|$, same direction* — carries over from the linear case for a **typical** book. When (i) the book has a *healthy* delta today ($D(0)$ not near zero), (ii) the exposure-relevant scenarios carry delta *comparable to* today's, and (iii) the book is net single-signed, then $\mathbb{E}[D(t)\mid V(t)>0]\approx D(0)$: the position is already "on" and cannot gear up much further, so the conditional-delta ratio is $\approx 1$ and the floor $P(V(t)>0)\le 1$ dominates, giving $|\Delta\text{EE}|\le|\Delta\text{MTM}|$ — exactly the linear fraction. This is the common case; the Part 2 spot-shock slopes of $1.0$–$1.04$ sit here (mildly above 1 only from forward drift and residual gearing). Intuitively: a net-directional book that is near or in the money behaves *almost linearly*, and inherits the linear bound.
 
-**Example — long out-of-the-money call** (three equally-likely future states; $\pi(t)=1$ for clarity, today's delta $D(0)=0.30$):
+**Contrarian cases (where it breaks).** The hypothesis fails only in specific, identifiable regimes — all requiring gamma:
+
+1. **Deep-OTM long options (small $D(0)$).** Today's delta is a long-shot value while the winning paths carry delta $\approx 1$: the gearing ratio $\mathbb{E}[D(t)\mid V>0]/D(0)\gg 1$ overwhelms the floor, so $|\Delta\text{EE}|>|\Delta\text{MTM}|$ (the example below). Amplification in **magnitude**.
+2. **Near-delta-neutral books ($D(0)\to 0$).** Straddles, strangles, delta-hedged option books: $\Delta\text{MTM}\approx 0$ while the exposure still responds, so $|\Delta\text{EE}|/|\Delta\text{MTM}|\to\infty$. The proxy has almost nothing to anchor to.
+3. **Mixed long/short with sign divergence.** When the delta averaged over the in-the-money paths has the *opposite sign* to today's net delta, $\text{sign}(\mathbb{E}[D(t)\mid V>0])\neq\text{sign}(D(0))$, the exposure and the MTM move in **opposite directions** — the proxy is wrong not just in size but in **direction**. A book net-short today but long-gamma with its exposure concentrated on the up-tail does exactly this: a positive shock lowers today's MTM while raising the future expected exposure.
+4. **Back-loaded / forward-starting profiles** (a non-gamma route). If the delta ramps up over the horizon, $\mathbb{E}[D(t)\mid V>0]>D(0)$ even without optionality.
+
+**Condition for amplification (magnitude):**
+$$|\Delta\text{EE}(t)| > |\Delta\text{MTM}| \iff \big|\mathbb{E}\big[D(t)\,\pi(t)\,\mathbf{1}\{V(t)>0\}\big]\big| > |D(0)|.$$
+
+**Example — contrarian case 1, a long out-of-the-money call** (three equally-likely future states; $\pi(t)=1$ for clarity, today's delta $D(0)=0.30$):
 
 | state | $V(t)$ | delta $D(t)$ |
 |---|---|---|
@@ -282,13 +292,17 @@ $$\Delta\text{EE}(t) > \Delta\text{MTM} \iff \mathbb{E}\big[D(t)\,\pi(t)\,\mathb
 | mid | 2 | 0.25 |
 | up | 30 | 0.95 |
 
-$$P(V>0)=\tfrac{2}{3},\quad \mathbb{E}[D(t)\mid V>0]=\tfrac{0.25+0.95}{2}=0.60,\quad \frac{\Delta\text{EE}(t)}{\Delta\text{MTM}}=\tfrac{2}{3}\cdot\frac{0.60}{0.30}=1.33 > 1.$$
+$$P(V>0)=\tfrac{2}{3},\quad \mathbb{E}[D(t)\mid V>0]=\tfrac{0.25+0.95}{2}=0.60,\quad \frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|}=\tfrac{2}{3}\cdot\frac{0.60}{0.30}=1.33 > 1.$$
 
-Today's MTM feels the shock through a small delta (0.30); the exposure feels the *future, in-the-money* delta (0.60) — double — so ΔEE(t) exceeds ΔMTM.
+Today's MTM feels the shock through a small delta (0.30); the exposure feels the *future, in-the-money* delta (0.60) — double — so $|\Delta\text{EE}(t)|$ exceeds $|\Delta\text{MTM}|$.
 
 **Time decay and the separate vega channel.** Delta gearing *survives* time decay: an aging option's delta sharpens toward 1 on the winning (ITM) paths, so the spot-shock ratio stays $\ge 1$ for OTM long-gamma books. A *different* risk factor — implied vol — enters through the **vega** $\nu(t)=\partial V/\partial\sigma$ rather than delta; since $\nu(t)\propto\sqrt{T-t}$ **decays to 0**, its conditional ratio $\mathbb{E}[\nu(t)\mid V>0]/\nu(0)\le 1$ *always*, giving the $\approx 2/3$ damping. Delta can amplify; vega only damps.
 
-**Consequence.** The non-linear ratio is **not bounded by 1** — gamma lets the delta on the in-the-money future exceed today's delta, so $\Delta\text{EE}(t)$ (and hence $\Delta\text{EEPE}$) can exceed $\Delta\text{MTM}$. This is the analytical backbone of the Part 2 spot-shock slopes of $\approx 1.02$–$1.04$ for OTM options; near-ATM or vega-dominated shocks return the ratio below 1.
+**Consequence — magnitude vs direction.** The non-linear case splits the proxy question into two, both impossible for a linear book:
+- **Magnitude:** $|\Delta\text{EE}|/|\Delta\text{MTM}|$ can exceed 1 (gamma gearing, contrarian cases 1–2 and 4).
+- **Direction:** $\Delta\text{EE}$ and $\Delta\text{MTM}$ can move *opposite ways* (sign divergence, contrarian case 3).
+
+In the **common** case — net-directional, near/in-money, single-signed — neither triggers, $\mathbb{E}[D(t)\mid V>0]\approx D(0)$, and the ratio behaves like the linear fraction (the Part 2 slopes of $\approx 1.02$–$1.04$). It is only the identifiable **contrarian regimes** — deep-OTM long gamma, near-delta-neutral, sign-divergent mixed books, and back-loaded profiles — where $\Delta\text{MTM}$ ceases to be a reliable proxy for $\Delta\text{EEPE}$, in size or in sign.
 
 ## References (indicative)
 
