@@ -173,6 +173,8 @@ matching the ≈ 0.66 slope measured for a *pure* implied-vol-level shock. In th
 2. **Optionality per se does not break the proxy** — a long-premium book keeps $V_0>0$, so CE inherits the gamma and vega. What the proxy cannot see is the **diffusion** dimension (realized vol and vol-of-vol) and the **vega term structure** of the implied-vol level.
 3. **Implied ≠ realized, and level ≠ diffusion.** Implied vol carries a level (seen by CE) and a vol-of-vol (unseen); realized vol is a third, separate parameter (also unseen). Treating any of these as one number hides real exposure.
 
+These are made exact in **Appendix C**, the non-linear mirror of Appendix B: the ratio becomes $P(V(t)>0)\cdot\mathbb{E}[D(t)\mid V(t)>0]/D(0)$, and the state-dependent (gamma) conditional-delta ratio can exceed 1 — so ΔEE(t), and hence ΔEEPE, can exceed ΔMTM.
+
 ---
 
 ## 6. Discussion
@@ -246,6 +248,47 @@ with $\Phi$ the standard normal CDF: the sensitivity ratio is exactly the probab
 | OTM | 1.25 | −0.15 | −1.93 | 0.03 |
 
 **Consequence.** Since $\Phi(\cdot)\le 1$, $\Delta\text{EE}(t)\le\Delta\text{MTM}$ for any linear book: the ratio is a genuine **fraction**, set by moneyness over dispersion — $\approx 1$ deep-ITM, exactly $0.5$ at the money, $\to 0$ deep-OTM — and pulled toward $0.5$ at long horizons as $\sigma_{\exp}(t)$ grows. A mean-reverting factor adds the $\pi(t)=e^{-\kappa t}<1$ dampener; an amortizing swap adds $D(t)/D(0)<1$. With no gamma, nothing can push the ratio above 1. This is the analytical backbone of the Part 1 results; the non-linear case (§5) replaces the deterministic $D(t)$ with a state-dependent one whose conditional average $\mathbb{E}[D(t)\mid V(t)>0]$ can exceed $D(0)$, allowing the ratio to exceed 1.
+
+## Appendix C — The non-linear law: when ΔEE(t) can exceed ΔMTM
+
+The exact mirror of Appendix B, with the affine portfolio replaced by a non-linear one — this is where the ratio can break above 1.
+
+**Setup.** One risk factor $X$, instantaneous shock $\varepsilon$ to $x_0$. A *non-linear* portfolio is a non-affine function of the factor,
+$$V(t) = g(X(t),\,t),\qquad D(t)=\frac{\partial V(t)}{\partial X(t)} = g_X(X(t),t),$$
+so the delta $D(t)$ is now **state-dependent** — it differs path by path — because the gamma $g_{XX}\neq 0$.
+
+**Propagation and value change.** The tangent factor $\pi(t)=\partial X(t)/\partial x_0$ is as in Appendix B. To first order in $\varepsilon$,
+$$\Delta V(t) = D(t)\,\pi(t)\,\varepsilon.$$
+
+**The two sensitivities.**
+$$\Delta\text{MTM} = D(0)\,\varepsilon,\qquad \Delta\text{EE}(t) = \varepsilon\,\mathbb{E}\big[\mathbf{1}\{V(t)>0\}\,D(t)\,\pi(t)\big].$$
+Now $D(t)$ is state-dependent, so — unlike the linear case — it **cannot** be pulled out of the path-expectation.
+
+**The ratio.** Write the expectation as probability × conditional expectation:
+$$\frac{\Delta\text{EE}(t)}{\Delta\text{MTM}} = \underbrace{P(V(t)>0)}_{\text{floor}\ \le 1} \cdot \underbrace{\frac{\mathbb{E}\big[D(t)\,\pi(t)\mid V(t)>0\big]}{D(0)}}_{\text{conditional-delta ratio}}.$$
+The floor is $\le 1$ exactly as before, but the **conditional-delta ratio is not bounded by 1**:
+
+- **Linear (Appendix B):** $D(t)$ is state-independent, so it collapses to the deterministic carry $D(t)/D(0)$ — mild, $\le 1$ typically.
+- **Non-linear:** $\mathbb{E}[D(t)\mid V(t)>0]$ can far **exceed** $D(0)$. For an out-of-the-money option, $D(0)$ is small (a long shot today), but the exposure-relevant paths — the ones with $V(t)>0$ — are exactly those where the underlying rallied and the option **geared up** to delta $\approx 1$. This is *gamma gearing*. The propagation $\pi(t)=X(t)/x_0>1$ on those same up-paths adds a second amplifier.
+
+**Condition for amplification:**
+$$\Delta\text{EE}(t) > \Delta\text{MTM} \iff \mathbb{E}\big[D(t)\,\pi(t)\,\mathbf{1}\{V(t)>0\}\big] > D(0).$$
+
+**Example — long out-of-the-money call** (three equally-likely future states; $\pi(t)=1$ for clarity, today's delta $D(0)=0.30$):
+
+| state | $V(t)$ | delta $D(t)$ |
+|---|---|---|
+| down | 0 | 0.00 |
+| mid | 2 | 0.25 |
+| up | 30 | 0.95 |
+
+$$P(V>0)=\tfrac{2}{3},\quad \mathbb{E}[D(t)\mid V>0]=\tfrac{0.25+0.95}{2}=0.60,\quad \frac{\Delta\text{EE}(t)}{\Delta\text{MTM}}=\tfrac{2}{3}\cdot\frac{0.60}{0.30}=1.33 > 1.$$
+
+Today's MTM feels the shock through a small delta (0.30); the exposure feels the *future, in-the-money* delta (0.60) — double — so ΔEE(t) exceeds ΔMTM.
+
+**Time decay and the separate vega channel.** Delta gearing *survives* time decay: an aging option's delta sharpens toward 1 on the winning (ITM) paths, so the spot-shock ratio stays $\ge 1$ for OTM long-gamma books. A *different* risk factor — implied vol — enters through the **vega** $\nu(t)=\partial V/\partial\sigma$ rather than delta; since $\nu(t)\propto\sqrt{T-t}$ **decays to 0**, its conditional ratio $\mathbb{E}[\nu(t)\mid V>0]/\nu(0)\le 1$ *always*, giving the $\approx 2/3$ damping. Delta can amplify; vega only damps.
+
+**Consequence.** The non-linear ratio is **not bounded by 1** — gamma lets the delta on the in-the-money future exceed today's delta, so $\Delta\text{EE}(t)$ (and hence $\Delta\text{EEPE}$) can exceed $\Delta\text{MTM}$. This is the analytical backbone of the Part 2 spot-shock slopes of $\approx 1.02$–$1.04$ for OTM options; near-ATM or vega-dominated shocks return the ratio below 1.
 
 ## References (indicative)
 
