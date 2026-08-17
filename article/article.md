@@ -124,6 +124,8 @@ The scatters above sweep the *magnitude* of a **single** combined shock, so they
 2. **Moneyness is the first gate.** EEPE is the smoothed hockey-stick $\mathbb{E}[\max(V_0+\sigma_{\text{exp}}\sqrt{T}\,Z,0)]$ in $V_0$. CE is its kinked $t=0$ shadow. They agree only where $V_0$ is many exposure-sigmas from zero.
 3. **Shocking the simulation vol is invisible to CE/MTM.** A linear book has *zero vega*, so ΔCE and ΔMTM are the same whether or not the shock moves $\sigma$; ΔEEPE is not. This is the cleanest statement that EEPE carries risk the proxy cannot.
 
+These are made exact in **Appendix B**, which derives the linear law $\Delta\text{EE}(t)/\Delta\text{MTM} = \Phi(\text{moneyness}/\text{dispersion})$ — the sensitivity ratio is exactly the in-the-money probability, bounded by 1.
+
 ---
 
 ## 5. Part 2 — Non-linear portfolio (options), implied vol as a risk factor
@@ -205,11 +207,45 @@ Current exposure is a good proxy for EEPE **only inside a well-defined regime**:
 
 ---
 
-## Appendix — Monte-Carlo estimators
+## Appendix A — Monte-Carlo estimators
 
 $$\widehat{\text{EE}}(t_k)=\frac{1}{M}\sum_{j=1}^{M}\max(V_j(t_k),0),\quad \widehat{\text{EffEE}}(t_k)=\max_{l\le k}\widehat{\text{EE}}(t_l),\quad \widehat{\text{EEPE}}=\frac{1}{T_w}\sum_{t_k\le T_w}\widehat{\text{EffEE}}(t_k)\Delta t_k.$$
 
 Non-discounted EE is used throughout; antithetic variates and common random numbers reduce variance and make the deltas clean. Collateralized exposure replaces $\max(V_t,0)$ with $\max(V_t-C_{t-\delta}-\text{IM},0)$ over a margin period of risk $\delta$.
+
+## Appendix B — The linear law: ΔEE(t) vs ΔMTM under an instantaneous shock
+
+We derive, for a **linear** portfolio, the exact relationship between the change in expected exposure at a future date and the change in today's mark-to-market. Working with EE(t) suffices — EEPE follows by time-averaging.
+
+**Setup.** One risk factor $X$ with $X(0)=x_0$; an instantaneous shock $\varepsilon$ is applied to $x_0$ at $t_0$. A *linear* portfolio is affine in the factor,
+$$V(t) = D(t)\,X(t) + b(t),$$
+with $D(t)=\partial V(t)/\partial X(t)$ and $b(t)$ **deterministic** (state-independent — i.e. zero gamma). $D(t)$ may vary with $t$ (carry, roll-off) but is the same on every path.
+
+**Propagation.** The shock reaches time $t$ through the tangent factor $\pi(t)=\partial X(t)/\partial x_0$, $\pi(0)=1$, fixed by the dynamics: $\pi(t)=X(t)/x_0$ for GBM (**persists**), $\pi(t)=e^{-\kappa t}$ for a mean-reverting factor (**decays**). Linearity makes the shocked path exactly $X(t)+\varepsilon\,\pi(t)$, so
+$$\Delta V(t) = D(t)\,\pi(t)\,\varepsilon \qquad(\text{exact}).$$
+
+**The two sensitivities.** At $t_0$, $\pi(0)=1$:
+$$\Delta\text{MTM} = \Delta V(0) = D(0)\,\varepsilon.$$
+Differentiating $\text{EE}(t)=\mathbb{E}[\max(V(t),0)]$ through the max (to first order in $\varepsilon$):
+$$\Delta\text{EE}(t) = \mathbb{E}\big[\mathbf{1}\{V(t)>0\}\,\Delta V(t)\big] = \varepsilon\,D(t)\,\mathbb{E}\big[\mathbf{1}\{V(t)>0\}\,\pi(t)\big],$$
+where the last step uses that $D(t)$ is **state-independent** and so pulls out of the path-expectation. This "pull-out" is the essence of linearity: no gamma, hence no path-dependent gearing.
+
+**The ratio.** For a deterministic $\pi(t)$, $\mathbb{E}[\mathbf{1}\{V>0\}\,\pi]=\pi\,P(V>0)$, giving three state-independent factors:
+$$\frac{\Delta\text{EE}(t)}{\Delta\text{MTM}} = \underbrace{\frac{D(t)}{D(0)}}_{\text{carry / roll-off}} \cdot \underbrace{\pi(t)}_{\text{persistence}} \cdot \underbrace{P(V(t)>0)}_{\text{floor (moneyness)}}.$$
+
+**Closed form.** Zeroing the carry ($D(t)/D(0)=1$) and taking a parallel shift ($\pi(t)=1$), $V(t)$ is Normal with mean $=\text{MTM}$ and standard deviation $\sigma_{\exp}(t)$ (the exposure dispersion), so
+$$\boxed{\ \frac{\Delta\text{EE}(t)}{\Delta\text{MTM}} = P(V(t)>0) = \Phi\!\left(\frac{\text{MTM}}{\sigma_{\exp}(t)}\right) = \Phi\!\left(\frac{\text{moneyness}}{\text{dispersion}}\right)\ }$$
+with $\Phi$ the standard normal CDF: the sensitivity ratio is exactly the probability of being in the money.
+
+**Example — FX forward** ($X_0=1.10$, $\sigma=0.11/\sqrt{\text{yr}}$, $t=0.5 \Rightarrow \sigma_{\exp}=0.078$):
+
+| case | strike K | moneyness $X_0-K$ | $(X_0-K)/\sigma_{\exp}$ | $\Delta\text{EE}(t)/\Delta\text{MTM}=\Phi(\cdot)$ |
+|---|---|---|---|---|
+| ITM | 0.95 | +0.15 | +1.93 | 0.97 |
+| ATM | 1.10 | 0.00 | 0.00 | 0.50 |
+| OTM | 1.25 | −0.15 | −1.93 | 0.03 |
+
+**Consequence.** Since $\Phi(\cdot)\le 1$, $\Delta\text{EE}(t)\le\Delta\text{MTM}$ for any linear book: the ratio is a genuine **fraction**, set by moneyness over dispersion — $\approx 1$ deep-ITM, exactly $0.5$ at the money, $\to 0$ deep-OTM — and pulled toward $0.5$ at long horizons as $\sigma_{\exp}(t)$ grows. A mean-reverting factor adds the $\pi(t)=e^{-\kappa t}<1$ dampener; an amortizing swap adds $D(t)/D(0)<1$. With no gamma, nothing can push the ratio above 1. This is the analytical backbone of the Part 1 results; the non-linear case (§5) replaces the deterministic $D(t)$ with a state-dependent one whose conditional average $\mathbb{E}[D(t)\mid V(t)>0]$ can exceed $D(0)$, allowing the ratio to exceed 1.
 
 ## References (indicative)
 
