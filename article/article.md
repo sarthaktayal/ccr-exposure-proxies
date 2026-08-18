@@ -252,9 +252,11 @@ $$\Delta\text{EE}(t) = \varepsilon\,\delta(t)\,\mathbb{E}\big[\mathbf{1}\{V(t)>0
 $$\frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = \frac{\delta(t)}{\delta(0)} \cdot \mathbb{E}\big[\pi(t)\mid V(t)>0\big] \cdot P(V(t)>0).$$
 The conditional propagation $\mathbb{E}[\pi(t)\mid V(t)>0]$ collapses to a plain $\pi(t)$ **only when $\pi$ is deterministic** — a constant across paths factors out of any expectation. For a *random* $\pi$ (GBM) it does not: the in-the-money (up) paths carry a larger $\pi$, so $\mathbb{E}[\pi\mid V>0]>\mathbb{E}[\pi]$ (up-selection). Signs always agree — both $\Delta\text{EE}$ and $\Delta\text{MTM}$ are $\varepsilon\,\delta(0)$ times a non-negative quantity — so signed and absolute ratios coincide. We take the three cases in turn.
 
-**Case 1 — additive shift ($\pi(t)=1$).** Deterministic, factors out. Here $V(t)$ is Normal with mean equal to the MTM and standard deviation $\sigma_{\exp}(t)=|\delta(t)|\sqrt{\operatorname{Var}[X(t)]}$ (the exposure dispersion). Zeroing the carry $\delta(t)/\delta(0)=1$,
-$$\boxed{\ \frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = P(V(t)>0) = \Phi\!\left(\frac{\text{MTM}}{\sigma_{\exp}(t)}\right)\ \le\ 1\ }$$
-the sensitivity ratio is exactly the probability of being in the money — "moneyness over dispersion."
+**Case 1 — additive shift ($\pi(t)=1$).** Deterministic $\pi$, so it factors out. Arithmetic Brownian motion is Gaussian, so $V(t)$ is Normal and
+$$\frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = \frac{\delta(t)}{\delta(0)}\cdot \Phi\!\left(\frac{m_V(t)}{\sigma_{\exp}(t)}\right),$$
+with mean $m_V(t)=\delta(t)\,\mathbb{E}[X(t)]+c(t)$ and dispersion $\sigma_{\exp}(t)=|\delta(t)|\sqrt{\operatorname{Var}[X(t)]}$, where $\mathbb{E}[X(t)]=x_0+mt$ and $\operatorname{Var}[X(t)]=\sigma^2 t$. The floor $\Phi(\cdot)\le 1$ is the essential fraction; the carry $\delta(t)/\delta(0)$ is a mild deterministic factor (below $1$ for an amortizing book, exactly $1$ for a flat delta, above $1$ for a forward with positive yield). With a flat delta and a driftless factor ($m=0$, so $m_V(t)=\text{MTM}$) it reduces to the pure "moneyness over dispersion" form
+$$\boxed{\ \frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = \Phi\!\left(\frac{\text{MTM}}{\sigma_{\exp}(t)}\right)\ }$$
+— the idealization used in the FX-forward example below.
 
 **Example (Case 1) — FX forward** ($X_0=1.10$, $\sigma=0.11/\sqrt{\text{yr}}$, $t=0.5 \Rightarrow \sigma_{\exp}=0.078$):
 
@@ -281,10 +283,10 @@ $$d_1=\frac{\ln\!\big(x_0/K(t)\big)+\big(\mu+\tfrac12\sigma^2\big)t}{\sigma\sqrt
 while the physical in-the-money probability is $P(V(t)>0)=\Phi(d_2)$ with $d_2=d_1-\sigma\sqrt{t}$. The forward is the special case $\delta\equiv 1,\ c=-K$ (so $K(t)=K$). Two mild lifts over Case 1 appear: the **forward drift** $e^{\mu t}$ (the mean propagation grows the future value) and the **up-selection** $\Phi(d_1)>\Phi(d_2)$ (the random $\pi$ is larger on the in-the-money paths). Deep in the money, $\Phi(d_1)\to 1$ and the ratio $\to (\delta(t)/\delta(0))\,e^{\mu t}>1$: a linear book can sit a few percent **above** 1. A driftless factor ($\mu=0$, flat delta) returns it to $\le 1$.
 
 **Consequence.** The structural linear conclusion holds in all three cases — with no gamma there is no *large* amplification and no sign flip; the ratio stays pinned near $P(V(t)>0)$, modified only by a mild, deterministic-or-drift factor. One row per case:
-$$\text{additive / driftless:}\qquad \frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = P(V(t)>0)\ \le\ 1,$$
-$$\text{mean-reverting:}\qquad \frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = \frac{\delta(t)}{\delta(0)}\,e^{-\kappa t}\,P(V(t)>0)\ \le\ 1,$$
-$$\text{GBM:}\qquad \frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = \frac{\delta(t)}{\delta(0)}\,e^{\mu t}\,\Phi(d_1)\quad\big(\le 1\ \text{up to the carry}\ e^{\mu t}\big).$$
-So $|\Delta\text{EE}|\le|\Delta\text{MTM}|$ holds *exactly* for additive/driftless and mean-reverting shocks, and *up to the bounded forward-drift factor* $e^{\mu t}$ (a few percent over the exposure window) for GBM. This is the analytical backbone of the Part 1 results; the non-linear case (§5, Appendix C) replaces the deterministic $\delta(t)$ with a state-dependent one whose conditional average $\mathbb{E}[\delta(t)\mid V(t)>0]$ can exceed $\delta(0)$ **without bound** — or flip sign.
+$$\text{additive:}\qquad \frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = \frac{\delta(t)}{\delta(0)}\,P(V(t)>0),$$
+$$\text{mean-reverting:}\qquad \frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = \frac{\delta(t)}{\delta(0)}\,e^{-\kappa t}\,P(V(t)>0),$$
+$$\text{GBM:}\qquad \frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = \frac{\delta(t)}{\delta(0)}\,e^{\mu t}\,\Phi(d_1).$$
+In every case the floor $P(V(t)>0)\le 1$ is the essential fraction; the carry $\delta(t)/\delta(0)$ and the propagation ($1$, $e^{-\kappa t}$, or $e^{\mu t}$) are mild, deterministic-or-drift factors. So $|\Delta\text{EE}|\le|\Delta\text{MTM}|$ holds whenever those factors are $\le 1$ (a flat or amortizing delta under a driftless or mean-reverting shock); a positive-carry forward ($\delta(t)/\delta(0)>1$) or GBM drift ($e^{\mu t}>1$) can nudge it a few percent above 1 — but, with no gamma, never by a large factor and never with a sign flip. This is the analytical backbone of the Part 1 results; the non-linear case (§5, Appendix C) replaces the deterministic $\delta(t)$ with a state-dependent one whose conditional average $\mathbb{E}[\delta(t)\mid V(t)>0]$ can exceed $\delta(0)$ **without bound** — or flip sign.
 
 ## Appendix C — The non-linear law: when ΔEE(t) can exceed ΔMTM
 
