@@ -217,13 +217,19 @@ Non-discounted EE is used throughout; antithetic variates and common random numb
 
 ## Appendix B — The linear law: ΔEE(t) vs ΔMTM under an instantaneous shock
 
-We derive, for a **linear** portfolio, the exact relationship between the change in expected exposure at a future date and the change in today's mark-to-market. Working with EE(t) suffices — EEPE follows by time-averaging.
+We derive, for a **linear** portfolio, the relationship between the change in expected exposure at a future date and the change in today's mark-to-market, for every propagation regime of the shock. Working with EE(t) suffices — EEPE follows by time-averaging.
 
 **Setup.** One risk factor $X$ with $X(0)=x_0$; an instantaneous shock $\varepsilon$ is applied to $x_0$ at $t_0$. A *linear* portfolio is affine in the factor,
 $$V(t) = D(t)\,X(t) + b(t),$$
 with $D(t)=\partial V(t)/\partial X(t)$ and $b(t)$ **deterministic** (state-independent — i.e. zero gamma). $D(t)$ may vary with $t$ (carry, roll-off) but is the same on every path.
 
-**Propagation.** The shock reaches time $t$ through the tangent factor $\pi(t)=\partial X(t)/\partial x_0$, $\pi(0)=1$, fixed by the dynamics: $\pi(t)=X(t)/x_0$ for GBM (**persists**), $\pi(t)=e^{-\kappa t}$ for a mean-reverting factor (**decays**). Linearity makes the shocked path exactly $X(t)+\varepsilon\,\pi(t)$, so
+**Propagation.** The shock reaches time $t$ through the tangent factor $\pi(t)=\partial X(t)/\partial x_0$, $\pi(0)=1$, fixed by the dynamics — and, decisively, by whether it is **deterministic or random**:
+
+- **additive / parallel shift:** $\pi(t)=1$ (deterministic);
+- **mean-reverting OU** (rates): $\pi(t)=e^{-\kappa t}$ (deterministic, **decays**);
+- **GBM** (spot, FX): $\pi(t)=X(t)/x_0$ (**random**, state-dependent), with mean $\mathbb{E}[\pi(t)]=e^{\mu t}$ ($\mu$ the drift).
+
+Linearity makes the shocked path exactly $X(t)+\varepsilon\,\pi(t)$, so
 $$\Delta V(t) = D(t)\,\pi(t)\,\varepsilon \qquad(\text{exact}).$$
 
 **The two sensitivities.** At $t_0$, $\pi(0)=1$:
@@ -232,15 +238,15 @@ Differentiating $\text{EE}(t)=\mathbb{E}[\max(V(t),0)]$ through the max (to firs
 $$\Delta\text{EE}(t) = \mathbb{E}\big[\mathbf{1}\{V(t)>0\}\,\Delta V(t)\big] = \varepsilon\,D(t)\,\mathbb{E}\big[\mathbf{1}\{V(t)>0\}\,\pi(t)\big],$$
 where the last step uses that $D(t)$ is **state-independent** and so pulls out of the path-expectation. This "pull-out" is the essence of linearity: no gamma, hence no path-dependent gearing.
 
-**The ratio (in magnitudes).** The meaningful comparison is $|\Delta\text{EE}(t)|$ against $|\Delta\text{MTM}|$. For a deterministic $\pi(t)$, $\mathbb{E}[\mathbf{1}\{V>0\}\,\pi]=\pi\,P(V>0)\ge 0$, giving three non-negative, state-independent factors:
-$$\frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = \underbrace{\frac{D(t)}{D(0)}}_{\text{carry / roll-off}} \cdot \underbrace{\pi(t)}_{\text{persistence}} \cdot \underbrace{P(V(t)>0)}_{\text{floor (moneyness)}}.$$
-**Signs always agree** for a linear book: both $\Delta\text{EE}$ and $\Delta\text{MTM}$ equal $\varepsilon\,D(0)$ times a non-negative quantity, so they co-move and the signed and absolute ratios coincide.
+**The ratio (always-true split).** Comparing $|\Delta\text{EE}(t)|$ to $|\Delta\text{MTM}|$, the exposure change always decomposes (definition of conditional expectation restricted to the event) as
+$$\frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = \frac{D(t)}{D(0)} \cdot \underbrace{\mathbb{E}\big[\pi(t)\mid V(t)>0\big]}_{\text{conditional propagation}} \cdot\, P(V(t)>0).$$
+The conditional propagation collapses to a plain $\pi(t)$ **only when $\pi$ is deterministic** — a constant across paths factors out of any expectation. For a **random** $\pi$ (GBM) it does not: the in-the-money (up) paths carry a *bigger* $\pi$, so $\mathbb{E}[\pi\mid V>0]>\mathbb{E}[\pi]$ (up-selection). **Signs always agree** — both $\Delta\text{EE}$ and $\Delta\text{MTM}$ are $\varepsilon\,D(0)$ times a non-negative quantity — so signed and absolute ratios coincide. We evaluate the three propagation cases in turn.
 
-**Closed form.** Zeroing the carry ($D(t)/D(0)=1$) and taking a parallel shift ($\pi(t)=1$), $V(t)$ is Normal with mean $=\text{MTM}$ and standard deviation $\sigma_{\exp}(t)$ (the exposure dispersion), so
-$$\boxed{\ \frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = P(V(t)>0) = \Phi\!\left(\frac{\text{MTM}}{\sigma_{\exp}(t)}\right) = \Phi\!\left(\frac{\text{moneyness}}{\text{dispersion}}\right)\ }$$
+**Case 1 — additive / parallel shift ($\pi(t)=1$).** Deterministic, factors out. Zeroing the carry, $V(t)$ is Normal with mean $=\text{MTM}$ and standard deviation $\sigma_{\exp}(t)$ (the exposure dispersion), so
+$$\boxed{\ \frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = P(V(t)>0) = \Phi\!\left(\frac{\text{MTM}}{\sigma_{\exp}(t)}\right) = \Phi\!\left(\frac{\text{moneyness}}{\text{dispersion}}\right)\ \le 1\ }$$
 with $\Phi$ the standard normal CDF: the sensitivity ratio is exactly the probability of being in the money.
 
-**Example — FX forward** ($X_0=1.10$, $\sigma=0.11/\sqrt{\text{yr}}$, $t=0.5 \Rightarrow \sigma_{\exp}=0.078$):
+**Example (Case 1) — FX forward** ($X_0=1.10$, $\sigma=0.11/\sqrt{\text{yr}}$, $t=0.5 \Rightarrow \sigma_{\exp}=0.078$):
 
 | case | strike K | moneyness $X_0-K$ | $(X_0-K)/\sigma_{\exp}$ | $\lvert\Delta\text{EE}(t)\rvert/\lvert\Delta\text{MTM}\rvert=\Phi(\cdot)$ |
 |---|---|---|---|---|
@@ -248,7 +254,19 @@ with $\Phi$ the standard normal CDF: the sensitivity ratio is exactly the probab
 | ATM | 1.10 | 0.00 | 0.00 | 0.50 |
 | OTM | 1.25 | −0.15 | −1.93 | 0.03 |
 
-**Consequence.** Since $\Phi(\cdot)\le 1$, $|\Delta\text{EE}(t)|\le|\Delta\text{MTM}|$ for any linear book — the hypothesis that *the exposure moves no more than the MTM, in the same direction*, always holds. The ratio is a genuine **fraction**, set by moneyness over dispersion — $\approx 1$ deep-ITM, exactly $0.5$ at the money, $\to 0$ deep-OTM — and pulled toward $0.5$ at long horizons as $\sigma_{\exp}(t)$ grows. A mean-reverting factor adds the $\pi(t)=e^{-\kappa t}<1$ dampener; an amortizing swap adds $D(t)/D(0)<1$. With no gamma, nothing can push the ratio above 1. This is the analytical backbone of the Part 1 results; the non-linear case (§5, Appendix C) replaces the deterministic $D(t)$ with a state-dependent one whose conditional average $\mathbb{E}[D(t)\mid V(t)>0]$ can exceed $D(0)$ — or flip sign.
+In Case 1 the ratio is a genuine **fraction**: $\approx 1$ deep-ITM, exactly $0.5$ at the money, $\to 0$ deep-OTM, and pulled toward $0.5$ at long horizons as $\sigma_{\exp}(t)$ grows.
+
+**Case 2 — mean-reverting factor ($\pi(t)=e^{-\kappa t}$).** Deterministic, factors out:
+$$\frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = \frac{D(t)}{D(0)}\cdot e^{-\kappa t}\cdot P(V(t)>0) \;\le\; P(V(t)>0) \;\le\; 1.$$
+The instantaneous shock **decays** over the horizon, pushing the ratio *further below* the Case-1 fraction (an amortizing swap adds a further $D(t)/D(0)<1$). Strictly a fraction.
+
+**Case 3 — GBM ($\pi(t)=X(t)/x_0$, random).** Does **not** factor out. For the forward $V(t)=X(t)-K$ the lognormal partial expectation $\mathbb{E}[X(t)\,\mathbf{1}\{X(t)>K\}]=x_0 e^{\mu t}N(d_1)$ gives
+$$\frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = e^{\mu t}\,N(d_1),\qquad d_1=\frac{\ln(x_0/K)+(\mu+\tfrac12\sigma^2)t}{\sigma\sqrt{t}},$$
+against the Case-1 value $P(V>0)=N(d_2)$ with $d_2=d_1-\sigma\sqrt{t}$. Two mild lifts appear: the **forward drift** $e^{\mu t}$ (the mean propagation grows the future value) and the **up-selection** $N(d_1)>N(d_2)$ (the random $\pi$ is bigger on the in-the-money paths). Deep-ITM, $N(d_1)\to 1$ and the ratio $\to e^{\mu t}>1$: a linear book can sit a few percent **above** 1. A driftless factor ($\mu=0$) returns the ratio to $\le 1$.
+
+**Consequence.** The **structural** linear conclusion holds in all three cases: with no gamma there is no *large* amplification and no sign flip — the ratio stays pinned near $P(V(t)>0)$, modified only by a mild, deterministic-or-drift factor:
+$$\frac{|\Delta\text{EE}(t)|}{|\Delta\text{MTM}|} = \begin{cases} P(V>0) & \text{additive / driftless } (\le 1,\ \text{exactly}) \\ e^{-\kappa t}\,P(V>0) & \text{mean-reverting } (\le 1,\ \text{damped}) \\ e^{\mu t}\,N(d_1) & \text{GBM } (\le 1 \text{ up to the carry } e^{\mu t}). \end{cases}$$
+So $|\Delta\text{EE}|\le|\Delta\text{MTM}|$ holds *exactly* for additive/driftless and mean-reverting shocks, and *up to the small forward-drift factor* $e^{\mu t}$ (a few percent over the exposure window) for GBM. This is the analytical backbone of the Part 1 results; the non-linear case (§5, Appendix C) replaces the deterministic $D(t)$ with a state-dependent one whose conditional average $\mathbb{E}[D(t)\mid V(t)>0]$ can exceed $D(0)$ **without bound** — or flip sign.
 
 ## Appendix C — The non-linear law: when ΔEE(t) can exceed ΔMTM
 
